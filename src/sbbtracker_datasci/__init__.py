@@ -1,8 +1,14 @@
 import datetime
 from dataclasses import dataclass
 import os
+import logging.config
 
 DATAFILE_VERSION = 'v2'
+
+fileconf = os.getenv('LOGGING_CONF')
+if fileconf:
+    logging.config.fileConfig(fileconf)
+
 
 @dataclass
 class PatchInfo:
