@@ -1,0 +1,3 @@
+git+https://github.com/SBBTracker/SBBBattleSim.git@main
+requests
+boto3
