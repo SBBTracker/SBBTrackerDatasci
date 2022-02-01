@@ -23,7 +23,49 @@ class FileInfo:
 
 
 class GlobalData:
-    pass
+
+    def __init__(self):
+        self.all_data = defaultdict(lambda : defaultdict(set))
+        self.mythic_games = defaultdict(set)
+        self.nonmythic_games = defaultdict(set)
+        self.games_by_placement = defaultdict(lambda : defaultdict(set))
+        self.games_by_starting_hero = defaultdict(lambda : defaultdict(set))
+
+        self.count_broken_files = 0
+        self.latest_patch = '67.4'
+
+
+    def add_file(self, fileinfo, data):
+        patch = '67.4'  # TODO add logic to separate games into patches
+
+        # Throw out shitty data
+        if not len(data['players']) == 8:
+            self.count_broken_files += 1
+            return
+
+        # Get some straightforward data
+        playerid = data['player-id']
+
+        # player info is a list, find the data pertaining to the actual player
+        player_info = None
+        for p in data['players']:
+            if p['player-id'] == playerid:
+                player_info = p
+        if player_info is None:
+            raise ValueError(f'Did not find player id {playerid} in file {fileinfo.filename}')
+
+        # Easier than complicated object shenanigans
+        game_hash_id = hash(f'{fileinfo.token}/{os.path.split(fileinfo.filename)[-1]}/{data["time"]}')
+
+        # split data in fun ways
+        self.all_data[patch][game_hash_id] = data
+        if data['possibly-mythic']:
+            self.mythic_games[patch].add(game_hash_id)
+        else:
+            self.nonmythic_games[patch].add(game_hash_id)
+
+        self.games_by_placement[patch][data['placement']].add(game_hash_id)
+        self.games_by_starting_hero[patch][player_info['heroes'][0]].add(game_hash_id)
 
 
 GLOBAL_DATA = GlobalData()
@@ -87,13 +129,14 @@ def load_data():
                         try:
                             char_id = templateids[char['id']]['Id']
                         except:
-                            logger.exception(f'Character {char} is proving difficult to import from file {fi}')
+                            logger.debug(f'Character {char} is proving difficult to import from file {fi}')
                             raise
+
 
                     if not char_id.startswith('SBB_CHARACTER'):
                         raise ValueError(f'Wrong template-ids file used with this data, id {char["id"]} maps to name {char_id} which is not a character')
                     char['id'] = char_id
-
+                
                 # Update treasure template ids to the SBB Ids
                 new_treasures = list()
                 for treasure in board['treasures']:
@@ -123,5 +166,5 @@ def load_data():
             new_combat_info.append({'combat': new_combat, 'round': combat['round']})
         
         data['combat-info'] = new_combat_info
-        print(json.dumps(data, sort_keys=True, indent=4))
-
+        GLOBAL_DATA.add_file(fi, data)
+        
