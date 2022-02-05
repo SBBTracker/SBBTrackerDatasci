@@ -134,31 +134,46 @@ def load_data():
 
 
                     if not char_id.startswith('SBB_CHARACTER'):
-                        raise ValueError(f'Wrong template-ids file used with this data, id {char["id"]} maps to name {char_id} which is not a character')
+                        logger.error(f'Wrong template-ids file used with this data, id {char["id"]} maps to name {char_id} which is not a character in file {fi}')
                     char['id'] = char_id
                 
                 # Update treasure template ids to the SBB Ids
                 new_treasures = list()
                 for treasure in board['treasures']:
-                    treasure_id = templateids[treasure]['Id']
+                    try:
+                        treasure_id = templateids[treasure]['Id']
+                    except:
+                        logger.error(f'Wrong template-ids file used with this data, id {treasure} not found in file {fi}')
+
                     if not treasure_id.startswith('SBB_TREASURE'):
-                        raise ValueError(f'Wrong template-ids file used with this data, id {treasure} maps to name {treasure_id} which is not a treasure')
+                        logger.error(f'Wrong template-ids file used with this data, id {treasure} maps to name {treasure_id} which is not a treasure in file {fi}')
                     new_treasures.append(treasure_id)
                 board['treasures'] = new_treasures
 
                 # Update spell tempalte ids to the SBB Ids
                 new_spells = list()
                 for spell in board['spells']:
-                    spell_id = templateids[spell]['Id']
+                    try:
+                        spell_id = templateids[spell]['Id']
+                    except:
+                        logger.error(f'Wrong template-ids file used with this data, id {spell} not found in file {fi}')
+
                     if not spell_id.startswith('SBB_SPELL'):
-                        raise ValueError(f'Wrong template-ids file used with this data, id {spell} maps to name {spell_id} which is not a spell')
+                        logger.error(f'Wrong template-ids file used with this data, id {spell} maps to name {spell_id} which is not a spell in file {fi}')
                     new_spells.append(spell_id)
                 board['spells'] = new_spells
 
                 # Update hero template ids to the SBB ids
-                hero_id = templateids[board['hero']]['Id']
+                if board['hero'] is None:
+                    continue
+
+                try:
+                    hero_id = templateids[board['hero']]['Id']
+                except:
+                    logger.error(f'Wrong template-ids file used with this data, id {board["hero"]} not found in file {fi}')
+
                 if not hero_id.startswith('SBB_HERO'):
-                    raise ValueError(f'Wrong template-ids file used with this data file, id {hero} maps to name {hero_id} which is not a hero')
+                    logger.error(f'Wrong template-ids file used with this data file, id {hero} maps to name {hero_id} which is not a hero in file {fi}')
                 board['hero'] = hero_id
 
                 new_combat[player] = board
