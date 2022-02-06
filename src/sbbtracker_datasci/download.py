@@ -6,8 +6,7 @@ import logging
 import datetime
 import tarfile
 from sbbtracker_datasci import MATCH_DOWNLOADS_DIR, MATCH_DATA_DIR, PATCH_INFO, TEMPLATEID_SUBDIR, DATAFILE_VERSION
-from botocore import UNSIGNED
-from botocore.client import Config
+
 logger = logging.getLogger(__name__)
 
 EARLIEST_DATE = datetime.datetime(year=2022, month=1, day=25)
@@ -74,11 +73,12 @@ def download_data(data_range=60):
     desired_files = _list_desired_files(downloaded_rollups, data_range)
 
     # Download the new files
-    client = boto3.client('s3')
+    client = boto3.client('s3', aws_access_key_id='', aws_secret_access_key='')
+    client._request_signer.sign = (lambda *args, **kwargs: None)
     for f in desired_files:
         logger.info(f'Downloading file {f} from s3')
         try:
-            data = client.get_object(Bucket='h8baw3zjca2jdtyhzv4t724tmzurimtp', Key=f'match-history/rollups/{DATAFILE_VERSION}/{f}', config=Config(signature_version=UNSIGNED))['Body'].read()
+            data = client.get_object(Bucket='h8baw3zjca2jdtyhzv4t724tmzurimtp', Key=f'match-history/rollups/{DATAFILE_VERSION}/{f}'))['Body'].read()
         except client.exceptions.NoSuchKey:
             logger.error(f'File {f} could not be found in s3')
             continue
