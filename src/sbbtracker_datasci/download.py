@@ -78,7 +78,7 @@ def download_data(data_range=60):
     for f in desired_files:
         logger.info(f'Downloading file {f} from s3')
         try:
-            data = client.get_object(Bucket='h8baw3zjca2jdtyhzv4t724tmzurimtp', Key=f'match-history/rollups/{DATAFILE_VERSION}/{f}'))['Body'].read()
+            data = client.get_object(Bucket='h8baw3zjca2jdtyhzv4t724tmzurimtp', Key=f'match-history/rollups/{DATAFILE_VERSION}/{f}')['Body'].read()
         except client.exceptions.NoSuchKey:
             logger.error(f'File {f} could not be found in s3')
             continue
