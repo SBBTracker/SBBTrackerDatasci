@@ -121,6 +121,7 @@ def load_data():
                 for char in board['characters']:
                     try:
                         char_id = templateids[char['id']]['Id']
+                        char_name = templateids[char['id']]['Name']
                         char['golden'] = False
                     except KeyError:
                         char['id'] = str(int(char['id']) - 1)
@@ -128,6 +129,7 @@ def load_data():
                         char['golden'] = True
                         try:
                             char_id = templateids[char['id']]['Id']
+                            char_name = templateids[char['id']]['Name']
                         except:
                             logger.debug(f'Character {char} is proving difficult to import from file {fi}')
                             raise
@@ -136,6 +138,7 @@ def load_data():
                     if not char_id.startswith('SBB_CHARACTER'):
                         logger.error(f'Wrong template-ids file used with this data, id {char["id"]} maps to name {char_id} which is not a character in file {fi}')
                     char['id'] = char_id
+                    char['name'] = char_name
                 
                 # Update treasure template ids to the SBB Ids
                 new_treasures = list()
@@ -169,12 +172,14 @@ def load_data():
 
                 try:
                     hero_id = templateids[board['hero']]['Id']
+                    hero_name = templateids[board['hero']]['Name']
                 except:
                     logger.error(f'Wrong template-ids file used with this data, id {board["hero"]} not found in file {fi}')
 
                 if not hero_id.startswith('SBB_HERO'):
                     logger.error(f'Wrong template-ids file used with this data file, id {hero} maps to name {hero_id} which is not a hero in file {fi}')
                 board['hero'] = hero_id
+                board['hero-name'] = hero_name
 
                 new_combat[player] = board
 
