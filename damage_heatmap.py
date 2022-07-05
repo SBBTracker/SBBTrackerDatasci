@@ -9,6 +9,7 @@ from collections import defaultdict
 from matplotlib.colors import LogNorm
 import matplotlib 
 import matplotlib.image as image
+import time
 
 l.load_data()
 mmftp = l.GLOBAL_DATA.mythic_games[l.GLOBAL_DATA.latest_patch]
@@ -20,7 +21,7 @@ damage_3_ls = []
 damage_4_ls = []
 damage_5_ls = []
 
-placements = [1,2,3,4,5,6,7,8]
+placements = [1,2]
 
 color_palettes = {
     'sbb-sequential-multihue': {
